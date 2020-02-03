@@ -1,0 +1,189 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.semanticui.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC|Roboto+Condensed&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Ma+Shan+Zheng|Raleway&display=swap" rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+    <style>
+      body {
+        font-family: "Roboto Condensed", sans-serif;
+        font-size: 1.2rem;
+        background-color: #a3c4bc;
+        text-align: center;
+      }
+      table.dataTable thead th,
+      table.dataTable.no-footer {
+        border-bottom: none;
+      }
+      .content{
+        margin:50px 7%;
+      }
+      img {
+        width: 25px;
+        margin-right: 5px;
+      }
+      thead tr th:nth-child(1),
+      tbody tr td:nth-child(1),h1 ,from{
+        font-family: "Noto Sans TC", sans-serif;
+      }
+      table.dataTable tbody tr {
+        background-color: #f2dda4 !important;
+      }
+      .sunrise {
+        margin-right: 10px;
+      }
+      .sunset {
+        margin-left: 10px;
+      }
+      .footer{
+        left: 50%;
+        color: #e38817;
+        font-size: 2rem;
+        font-family: "Ma Shan Zheng", cursive;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class='content'>
+        <h1>未來七日日出日落時間</h1>
+        <table id="table" class="ui celled tabl hover row-border">
+            <thead>
+                <tr>
+                    <th>縣市</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class='form'>資料來源中央氣象局</p>
+    <p class="footer">reirajiang © 2020</p>
+
+    <script>
+      var print = "";
+      var data;
+      var now = new Date();
+      var thisyear = now.getFullYear();
+      var nextyear = thisyear + 1;
+      var starttime = new Date(`January 1,${thisyear} 00:00:00`).getTime();
+      var endtime = new Date(`January 1,${thisyear + 1} 00:00:00`).getTime();
+      var target = (endtime - starttime) / 1000;
+      var today = Math.floor(target / 60 / 60 / 24);
+
+      $.getJSON("https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/A-B0062-001?Authorization=CWB-9444FCA9-4990-439C-A8EE-52BC14185B39&downloadType=WEB&format=JSON")
+        .done(function(re) {
+          data = re.cwbopendata.dataset;
+          $("thead").find("th").eq(1).text(`${data.locations.location[0].time[today - 1].dataTime}`);
+          $("thead").find("th").eq(2).text(`${data.locations.location[0].time[today].dataTime}`);
+          $("thead").find("th").eq(3).text(`${data.locations.location[0].time[today + 1].dataTime}`);
+          $("thead").find("th").eq(4).text(`${data.locations.location[0].time[today + 2].dataTime}`);
+          $("thead").find("th").eq(5).text(`${data.locations.location[0].time[today + 3].dataTime}`);
+          $("thead").find("th").eq(6).text(`${data.locations.location[0].time[today + 4].dataTime}`);
+          $("thead").find("th").eq(7).text(`${data.locations.location[0].time[today + 5].dataTime}`);
+          for (let i = 0; i < data.locations.location.length; i++) {
+            print += `
+                <tr>
+                <td>${data.locations.location[i].locationName}</td>
+                <td>
+                    <span class='sunrise'>
+                    <img src="img/sunrise.png" alt="日出時間" srcset="">
+                        ${data.locations.location[i].time[today - 1].parameter[1].parameterValue.substr(0, 5)}
+                        </span>
+                    <span class='sunset'>
+                    <img src="img/sunset.png" alt="日落時間" srcset="">
+                        ${data.locations.location[i].time[today - 1].parameter[5].parameterValue.substr(0, 5)}
+                    </span>
+                </td>
+                <td>
+                    <span class='sunrise'>
+                    <img src="img/sunrise.png" alt="日出時間" srcset="">
+                        ${data.locations.location[i].time[today].parameter[1].parameterValue.substr(0, 5)}
+                        </span>
+                    <span class='sunset'>
+                    <img src="img/sunset.png" alt="日落時間" srcset="">
+                        ${data.locations.location[i].time[today].parameter[5].parameterValue.substr(0, 5)}
+                    </span>
+                </td>
+                <td>
+                    <span class='sunrise'>
+                    <img src="img/sunrise.png" alt="日出時間" srcset="">
+                        ${data.locations.location[i].time[today + 1].parameter[1].parameterValue.substr(0, 5)}
+                        </span>
+                    <span class='sunset'>
+                    <img src="img/sunset.png" alt="日落時間" srcset="">
+                        ${data.locations.location[i].time[today + 1].parameter[5].parameterValue.substr(0, 5)}
+                    </span>
+                </td>
+                <td>
+                    <span class='sunrise'>
+                    <img src="img/sunrise.png" alt="日出時間" srcset="">
+                        ${data.locations.location[i].time[today + 2].parameter[1].parameterValue.substr(0, 5)}
+                        </span>
+                    <span class='sunset'>
+                    <img src="img/sunset.png" alt="日落時間" srcset="">
+                        ${data.locations.location[i].time[today + 2].parameter[5].parameterValue.substr(0, 5)}
+                    </span>
+                </td>
+                <td>
+                    <span class='sunrise'>
+                    <img src="img/sunrise.png" alt="日出時間" srcset="">
+                        ${data.locations.location[i].time[today + 3].parameter[1].parameterValue.substr(0, 5)}
+                        </span>
+                    <span class='sunset'>
+                    <img src="img/sunset.png" alt="日落時間" srcset="">
+                        ${data.locations.location[i].time[today + 3].parameter[5].parameterValue.substr(0, 5)}
+                    </span>
+                </td>
+                <td>
+                    <span class='sunrise'>
+                    <img src="img/sunrise.png" alt="日出時間" srcset="">
+                        ${data.locations.location[i].time[today + 4].parameter[1].parameterValue.substr(0, 5)}
+                        </span>
+                    <span class='sunset'>
+                    <img src="img/sunset.png" alt="日落時間" srcset="">
+                        ${data.locations.location[i].time[today + 4].parameter[5].parameterValue.substr(0, 5)}
+                    </span>
+                </td>
+                <td>
+                    <span class='sunrise'>
+                    <img src="img/sunrise.png" alt="日出時間" srcset="">
+                        ${data.locations.location[i].time[today + 5].parameter[1].parameterValue.substr(0, 5)}
+                        </span>
+                    <span class='sunset'>
+                    <img src="img/sunset.png" alt="日落時間" srcset="">
+                        ${data.locations.location[i].time[today + 5].parameter[5].parameterValue.substr(0, 5)}
+                    </span>
+                </td>
+                
+                </tr>
+                `;
+          }
+
+          $("tbody").html(print);
+          $("#table").DataTable();
+          $("#table_filter").hide();
+          $(".dataTables_length").hide();
+        })
+        .fail(function() {
+          alert("氣象局API有問題暫時無法連線");
+        });
+    </script>
+  </body>
+</html>
